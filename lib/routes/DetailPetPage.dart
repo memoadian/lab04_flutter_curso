@@ -4,33 +4,39 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;//http
 
 class DetailPetPage extends StatelessWidget {
+  //declaramos el id
   final int id;
-
+  //creamos el constructor de la clase con el param id
   DetailPetPage(this.id);
 
+  //declaramos la funcion future de tipo pet
   Future<Pet> fetchPet() async {
+    //hacemos el request get pasando el id al endpoint
     final response = await http.get('http://pets.memoadian.com/api/pets/$id');
 
-    print('http://pets.memoadian.com/api/pets/$id');
-
+    // si la respuesta es 200
     if (response.statusCode == 200) {
-      print(response.body);
+      //ahora retornamos el model Pet
       return Pet.fromJson(json.decode(response.body));
     } else {
-      print('error');
+      //si no lanzamos una excepción
       throw Exception('Failed to load post');
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Detalle de Amigo"),
+  Widget build(BuildContext context) {//widget
+    return Scaffold(// Scaffold
+      appBar: AppBar(//AppBar
+        title: Text('Ver Amigo'),//titulo appbar
       ),
+      //Future Builder para cachar la respuesta en un snapshot
       body: FutureBuilder<Pet>(
+        //usamos la propiedad future para llamar la función fetchPet
         future: fetchPet(),
+        //usamos un builder para pasar el parámetro snapshot
         builder: (context, snapshot){
+          //si existen datos en el snapshot
           if (snapshot.hasData) {
             return Container(
               child: Card(//creamos una card
@@ -40,17 +46,18 @@ class DetailPetPage extends StatelessWidget {
                   children: <Widget>[//array
                     Container (//contenedor de imagen
                       padding: EdgeInsets.all(10.0),//padding
-                      child: Image.network(snapshot.data.image),//imagen interna
+                      //imagen de servidor snapshot data image
+                      child: Image.network(snapshot.data.image),
                     ),
                     Container (//contenedor de texto
                       padding: EdgeInsets.all(10.0),//padding
-                      child: Text(snapshot.data.name,//título
+                      child: Text(snapshot.data.name,//título snapshot
                         style: TextStyle(fontSize: 18)//estilo del texto
                       ),
                     ),
                     Container(
                       padding: EdgeInsets.all(10.0),
-                      child: Text(//descripción
+                      child: Text(//descripción snapshot descripción
                         snapshot.data.desc, textAlign: TextAlign.center,
                       ),
                     ),
@@ -58,12 +65,23 @@ class DetailPetPage extends StatelessWidget {
                 ),
               ),
             );
+          //si hay un error en el snapshot
           } else if (snapshot.hasError) {
+            // lo mostramos en la vista
             return Text('${snapshot.error}');
           }
-
+          //por defecto mostramos un progress en lo que responde el servidor
           return Center(
-            child: CircularProgressIndicator(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text('Cargando'),
+                ),
+                CircularProgressIndicator()
+              ],
+            ),
           );
         }
       ),
