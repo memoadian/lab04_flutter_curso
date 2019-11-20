@@ -1,14 +1,14 @@
 import 'dart:io';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
 import 'package:image_picker/image_picker.dart';
 
-import 'package:progress_dialog/progress_dialog.dart';
-import 'package:http/http.dart' as http;
-import 'package:lab_02/models_api/Pet.dart';
-import 'package:lab_02/main.dart';
+import 'dart:convert';//para usar json
+import 'package:progress_dialog/progress_dialog.dart';//progress dialgo al enviar form
+import 'package:http/http.dart' as http;//http
+import 'package:lab_02/models_api/Pet.dart';//model Pet
+import 'package:lab_02/main.dart';//vista principal
 
 class AddPetPage extends StatelessWidget {
   @override
@@ -30,22 +30,27 @@ class FormAddPet extends StatefulWidget {
 class FormAddPetState extends State<FormAddPet> {
   //declaramos una variable donde guardaremos el item seleccionado
   String _selectedType = 'Por favor escoge';
+  //variable para guardar el Id el item
   String _selectedTypeId;
   //variable auxiliar SwitchListTile
   bool _rescue = false;
   //image file for picker image
   File _imageFile;
+  //creamos la variable del progress Dialog
   ProgressDialog pr;
 
   //global key para validar
   GlobalKey<FormState> _formKey = GlobalKey();
 
+  //declaramos una función para ver si está validado
   bool _validate = false;
 
+  //controladores para los inputs de texto
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController ageController = TextEditingController();
 
+  //Lista clave valor para los items del dropdown
   List<PetKeyValue> _data = [
     PetKeyValue(key: 'Perrito', value: '1'),
     PetKeyValue(key: 'Gatito', value: '2'),
@@ -56,6 +61,7 @@ class FormAddPetState extends State<FormAddPet> {
     return SingleChildScrollView(//creamos una vista scrolleable
       child: Form(//añadimos un form
         key: _formKey, //añadimos la llave a nuestro form
+        //añadimos autovalidate para hacer dinámica la validación de los inputs
         autovalidate: _validate,
         child: _form(),//llamamos desde aqui la funcion que construye el form
       ),
@@ -68,7 +74,7 @@ class FormAddPetState extends State<FormAddPet> {
       child: Column(//column para multiples hijos
         children: <Widget>[//array
           TextFormField(//text form field para validar
-            controller: titleController,
+            controller: titleController,//para obtener el contenido del input
             decoration: InputDecoration(
               icon: Icon(Icons.pets),//añadimos un icono
               hintText: 'Nombre', //placeholder
@@ -110,12 +116,12 @@ class FormAddPetState extends State<FormAddPet> {
               isExpanded: true,//expandimos el elemento al 100%
               items: _data.map((data) {//mapeamos el array de tipos
                 return DropdownMenuItem<PetKeyValue>(//retornamos cada item
-                  value: data,//valor
+                  value: data,//valor id
                   child: Text(data.key),//texto del valor
                 );
               }).toList(),//convertimos en lista
               onChanged: (PetKeyValue value) {//evento change
-                _selectedType = value.key;
+                _selectedType = value.key;//texto
                 setState(() {//seteamos el estado
                   _selectedTypeId = value.value;//cambiamos el elemento seleccionado
                 });
@@ -205,25 +211,32 @@ class FormAddPetState extends State<FormAddPet> {
   }
 
   void _validateForm () {
+    //si todos los inputs son válidos
     if (_formKey.currentState.validate()) {
+      //iniciamos la configuración del progress dialog      
       pr = new ProgressDialog(context, 
-        type: ProgressDialogType.Normal,
-        isDismissible: false,
+        type: ProgressDialogType.Normal,//progress normal
+        isDismissible: false,//no puede ser cerrado manual
       );
-      pr.show();
+      pr.show();//mostramos el progress dialog
 
-      Pet newPet = Pet(
-        name: titleController.text,
-        desc: descriptionController.text,
+      Pet newPet = Pet(//creamos un nuevo Pet
+        name: titleController.text,//nombre del title controller
+        desc: descriptionController.text,//descripcion
+        //si la edad está vacía por alguna razón la seteamos a 0
+        //si no obtenemos el valor numérico del String
         age: (ageController.text != '') ? int.parse(ageController.text) : 0,
-        image: _getImage(),
-        typeId: int.parse(_selectedTypeId),
-        statusId: (_rescue) ? 2 : 1,
+        image: _getImage(),//obtenemos la imagen de la función getImage
+        typeId: int.parse(_selectedTypeId),//obtenemos el valor numérico del tipo
+        statusId: (_rescue) ? 2 : 1,//si el PetAmigo es rescatado 2 - si no 1
       );
 
-      createPost('http://pets.memoadian.com/api/pets', body: newPet.toMap());
+      //pasámos el endpoint a la función createPost y el modelo 
+      createPost('http://pets.memoadian.com/api/pets', newPet.toMap());
     } else {
       setState(() {
+        //seteamos la variable validate a true para hacer dinamico el
+        //o los inputs a corregir
         _validate = true;
       });
     }
@@ -246,27 +259,36 @@ class FormAddPetState extends State<FormAddPet> {
     }
   }
 
+  //función para devolver la imagen en base64
   String _getImage () {
+    //si la imagen es nula retornamos un String vacío
     if (_imageFile == null) return '';
+    //transformamos la imagen a String base64
     String base64Image = base64Encode(_imageFile.readAsBytesSync());
-    return base64Image;
+    return base64Image;//retornamos la imagen transformada
   }
 
-  void createPost(String url, {Map body}) async {
-    return http.post(url, body: body).then((http.Response response) {
-      final int statusCode = response.statusCode;
+  //create post con dos parámetros (endpoint y maps de datos)
+  void createPost(String url, Map body) async {//asincrono
+    return http.post(url, body: body)//hacemos el request post
+      .then((http.Response response) {//cuando responde
+        final int statusCode = response.statusCode;//obtenemos el código de respuesta
   
-      if (statusCode < 200 || statusCode > 400 || json == null) {
-        print(response.body);
-        pr.dismiss();
-        throw new Exception("Error while fetching data"+response.body);
+        //si el status es diferente de los considerados correctos
+        if (statusCode < 200 || statusCode > 400 || json == null) {
+          pr.dismiss();//cerramos el progress dialog
+          //creamos una excepción
+          throw new Exception("Error while fetching data"+response.body);
+        }
+
+        //si todo sale bien mandamos a la vista principal
+        Navigator.push(context,
+          MaterialPageRoute(
+            builder: (context) => MyApp(),
+          ),
+        );
       }
-      Navigator.push(context,
-        MaterialPageRoute(
-          builder: (context) => MyApp(),
-        ),
-      );
-    });
+    );
   }
 }
 

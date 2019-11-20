@@ -6,9 +6,9 @@ class Pet { // creamos una clase Pet
   final int age;
   final String image;
   final String type;
-  final int typeId;
+  final int typeId;//id del tipo de petAmigo
   final String status;
-  final int statusId;
+  final int statusId;//status del petAmigo
 
   //asignamos las variables en el constructor
   Pet({
@@ -18,9 +18,9 @@ class Pet { // creamos una clase Pet
     this.age,
     this.image,
     this.type,
-    this.typeId,
+    this.typeId,//añadimos al constructor
     this.status,
-    this.statusId
+    this.statusId//añadimos al constructor
   });
 
   /* mapeamos la respuesta para usarla más facilmente
@@ -33,31 +33,21 @@ class Pet { // creamos una clase Pet
       desc: json['desc'],
       age: json['age'],
       image: json['image'] ?? 'logo_flutter.png',
-      typeId: json['type']['id'],
       type: json['type']['name'],
       status: json['status']['name']
     );
   }
 
+  //añadimos una función para mapear los datos del formulario
   Map toMap() {
     var map = Map<String, dynamic>();
     map['name'] = name;
     map['desc'] = desc;
-    map['age'] = age.toString();
+    map['age'] = age.toString();//transformamos int a String
     map['image'] = image;
-    map['typeId'] = typeId.toString();
-    map['statusId'] = statusId.toString();
+    map['typeId'] = typeId.toString();//transformamos int a String
+    map['statusId'] = statusId.toString();//transformamos int a String
  
     return map;
   }
 }
-
-
-
-
-
-
-
-
-
-
