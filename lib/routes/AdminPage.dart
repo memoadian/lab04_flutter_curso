@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lab_02/routes/AddPetPage.dart';
 import 'package:lab_02/routes/EditPetPage.dart';//importamos Añadir amigo
 import 'package:lab_02/models_api/Pet.dart';//importamos el mdoelo Pet.dart+
-import 'dart:convert';
+import 'dart:convert';//json
 import 'package:http/http.dart' as http;
 
 class AdminPage extends StatefulWidget{
@@ -125,8 +125,8 @@ class AdminPageState extends State<AdminPage>{
 
   Widget server (BuildContext context) {
     return ListView.builder(//listview builder
-      itemCount: _pets.length,
-      itemBuilder: _petsBuilder,
+      itemCount: _pets.length,//contamos los elementos de la lista
+      itemBuilder: _petsBuilder,//llamamos a la función que renderiza cada elemento
     );
   }
 
@@ -134,17 +134,19 @@ class AdminPageState extends State<AdminPage>{
     return Card(//card
       margin: EdgeInsets.all(5.0),//margen
       child: ListTile(//Listile para ordenar
-        title: Text(_pets[pos].name),//tacomodaritulo
-        subtitle: Text('Edad: ${_pets[pos].age}'),//subtitulo
-        leading: Column(
-          children: <Widget>[
-            Padding(padding: EdgeInsets.all(0)),
-            ClipRRect(
+        //obtenemos el nombre del array pets propiedad name
+        title: Text(_pets[pos].name),
+        subtitle: Text('Edad: ${_pets[pos].age}'),//edad
+        leading: Column(//creamos una columna para contener la imagen
+          children: <Widget>[//array
+            Padding(padding: EdgeInsets.all(0)),//padding
+            ClipRRect(//haremos que la imagen tenga borde redondeado
+              //al 100% para que sea circular
               borderRadius: new BorderRadius.circular(100.0),
-              child: Image.network(
-                  _pets[pos].image,
-                  height: 50.0,
-                  width: 50.0,
+              child: Image.network(//imagen de internet
+                  _pets[pos].image,//propiedad imagen
+                  height: 50.0,//alto
+                  width: 50.0,//ancho
               ),
             )
           ],
