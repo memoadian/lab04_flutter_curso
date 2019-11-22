@@ -106,7 +106,7 @@ class AdminPageState extends State<AdminPage>{
                     Navigator.push(context,
                       MaterialPageRoute(
                         //navegar a editar amigo
-                        builder: (context) => EditPetPage()
+                        //builder: (context) => EditPetPage()
                       ),
                     );
                   },
@@ -160,7 +160,7 @@ class AdminPageState extends State<AdminPage>{
                 Navigator.push(context,
                   MaterialPageRoute(
                     //navegar a editar amigo
-                    builder: (context) => EditPetPage()
+                    builder: (context) => EditPetPage(_pets[pos].id)
                   ),
                 );
               },

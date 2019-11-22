@@ -10,24 +10,20 @@ import 'package:http/http.dart' as http;//http
 import 'package:lab_02/models_api/Pet.dart';//model Pet
 import 'package:lab_02/main.dart';//vista principal
 
-class EditPetPage extends StatelessWidget {
+class EditPetPage extends StatefulWidget {
+  final int id;
+
+  EditPetPage(this.id);
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Editar Amigo"),
-      ),
-      body: FormEditPet()
-    );
-  }
+  createState() => EditPetPageState(id);
 }
 
-class FormEditPet extends StatefulWidget {
-  @override
-  createState() => FormEditPetState();
-}
+class EditPetPageState extends State<EditPetPage> {
+  final int id;
 
-class FormEditPetState extends State<FormEditPet> {
+  EditPetPageState(this.id);
+
   //declaramos una variable donde guardaremos el item seleccionado
   String _selectedType = 'Por favor escoge';
   //variable para guardar el Id el item
@@ -46,9 +42,9 @@ class FormEditPetState extends State<FormEditPet> {
   bool _validate = false;
 
   //controladores para los inputs de texto
-  TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController ageController = TextEditingController();
+  TextEditingController titleController;
+  TextEditingController descriptionController;
+  TextEditingController ageController;
 
   //Lista clave valor para los items del dropdown
   List<PetKeyValue> _data = [
@@ -57,18 +53,66 @@ class FormEditPetState extends State<FormEditPet> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _getEditPet();
+  }
+
+  Future<Pet> _getEditPet() async{
+    //consumimos el webservice con la librería http y get
+    final response = await http.get('http://pets.memoadian.com/api/pets/$id');
+
+    //si la respuesta es correcta responderá con 200
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);//guardamos la respuesta en json
+      return Pet.fromJson(result);
+    } else {
+      throw Exception('Fallo al cargar información del servidor');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(//creamos una vista scrolleable
-      child: Form(//añadimos un form
-        key: _formKey, //añadimos la llave a nuestro form
-        //añadimos autovalidate para hacer dinámica la validación de los inputs
-        autovalidate: _validate,
-        child: _form(),//llamamos desde aqui la funcion que construye el form
+    return Scaffold (
+      appBar: AppBar(
+        title: Text("Editar Amigo"),
+      ),
+      body: SingleChildScrollView(//creamos una vista scrolleable
+        child: Form(//añadimos un form
+          key: _formKey, //añadimos la llave a nuestro form
+          //añadimos autovalidate para hacer dinámica la validación de los inputs
+          autovalidate: _validate,
+          child: _builder(),//llamamos desde aqui la funcion que construye el form
+        ),
       ),
     );
   }
 
-  Widget _form () {
+  Widget _builder () {
+    return FutureBuilder<Pet>(
+      future: _getEditPet(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          return _form(snapshot);
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.hasError}');
+        }
+
+        return Container(
+          padding: EdgeInsets.only(top: 120.0, bottom: 20.0),
+          child: Center(
+            child: CircularProgressIndicator()
+          ),
+        );
+      }
+    );
+  }
+
+  Widget _form (AsyncSnapshot snapshot) {
+    titleController = TextEditingController(text: snapshot.data.name);
+    descriptionController = TextEditingController(text: snapshot.data.desc);
+    ageController = TextEditingController(text: snapshot.data.age.toString());
+
     return Container(//añadimos un contenedor
       padding: EdgeInsets.all(10.0),//padding
       child: Column(//column para multiples hijos
@@ -113,6 +157,7 @@ class FormEditPetState extends State<FormEditPet> {
             padding: EdgeInsets.only(left: 5.0, top: 10.0),//padding left y top
             child: DropdownButton<PetKeyValue>(//Declaramos el widget dropdown
               hint: Text(_selectedType),//texto placeholder
+              value: (snapshot.data.typeId == 1) ? _data[0] : _data[1],
               isExpanded: true,//expandimos el elemento al 100%
               items: _data.map((data) {//mapeamos el array de tipos
                 return DropdownMenuItem<PetKeyValue>(//retornamos cada item
@@ -132,14 +177,14 @@ class FormEditPetState extends State<FormEditPet> {
           //label a la izquierda y no centrar el switch
           SwitchListTile(
             title: Text('Rescatado'),//label
-            value: _rescue,//activo o inactivo
+            value: (snapshot.data.statusId == 2) ? true : false,//activo o inactivo
             onChanged: (bool value) {//evento change param bool
               setState(() {//set state dentro de stateful widget
                 _rescue = value;//seteamos el nuevo valor de _rescue
               });
             },
           ),
-          _chooseImage(context),
+          _chooseImage(context, snapshot),
           SizedBox(//sized box permite manejar dimensiones de sus hijos
             width: double.infinity,//colocamos un ancho que se ajuste al padre
             child: RaisedButton(//declaramos el botón sin icono
@@ -172,11 +217,11 @@ class FormEditPetState extends State<FormEditPet> {
   }
 
   //función escoger imagen
-  Widget _chooseImage(BuildContext context) {
+  Widget _chooseImage(BuildContext context, AsyncSnapshot snapshot) {
     return Center(//centrareamos la imagen
       child: Column(//columna para usar array
         children: <Widget>[//array
-          _imageDefault(),//llamamos la funcion imagen por defecto
+          _imageDefault(snapshot),//llamamos la funcion imagen por defecto
           RaisedButton(//botón para seleccionar imagen
             child: Text('Escoger Imágen'),//Texto del botón
             //evento press que llama la función para seleccionar
@@ -197,12 +242,12 @@ class FormEditPetState extends State<FormEditPet> {
     });
   }
 
-  Widget _imageDefault () {//widget imagen por defecto
+  Widget _imageDefault (AsyncSnapshot snapdata) {//widget imagen por defecto
     return FutureBuilder<File>(//retornamos un future builder de la imagen
       builder: (context, snapshot) {//snapshot de la imagen seleccionada
         return Container(//contenedor
           child: _imageFile == null //si la imagen es nula
-                ? Text ('Seleccionar imagen')//colocamos un texto
+                ? Image.network(snapdata.data.image)//colocamos un texto
                 //si no es nula retornamos la imagen seleccionada
                 : Image.file(_imageFile, width: 300, height: 300),
         );

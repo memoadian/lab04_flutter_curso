@@ -34,7 +34,9 @@ class Pet { // creamos una clase Pet
       age: json['age'],
       image: json['image'] ?? 'logo_flutter.png',
       type: json['type']['name'],
-      status: json['status']['name']
+      typeId: json['type']['id'],
+      status: json['status']['name'],
+      statusId: json['status']['id']
     );
   }
 
