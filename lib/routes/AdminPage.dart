@@ -167,11 +167,67 @@ class AdminPageState extends State<AdminPage>{
             ),
             IconButton(//icono con botón
               icon: Icon(Icons.delete),//icono
-              onPressed: () {},//evento press eliminar
+              //evento press eliminar llevará los parámetros contexto
+              //la posicion del elemento, y el id para consumir el ws
+              onPressed: () => deleteAlert(context, pos, _pets[pos].id),
             ),
           ],
         ),
       ),
     );
+  }
+
+  //función asincrona estandar para un alert
+  Future deleteAlert(BuildContext context, int position, int id) async {
+    return showDialog<Null>(//funcion showDialog
+      context: context,//declaramos el contexto de la alerta
+      builder: (BuildContext context) {//iniciamos el builder
+        return AlertDialog(//retornamos un AlertDialog
+          title: Text('Confirmar'),//titulo del alert
+          content: const Text('Esta acción no puede deshacerse'),//body
+          actions: <Widget>[//array de botones
+            FlatButton(//botón cancelar
+              child: Text('Cancelar'),//texto del botón cancelar
+              onPressed: () {//al presionar
+                Navigator.of(context).pop();//cerramos el alert
+              },
+            ),
+            FlatButton(//botón confirmar
+              child: Text('Eliminar'),//texto del botón de confirmar
+              onPressed: () {//al presionar
+                //llamamos la función que elimina el elemento
+                deletePet(context, position, id);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  //funcion asincrona para eliminar elementos del servidor por ID
+  void deletePet(context, int position, int id) async {
+    String url = 'http://pets.memoadian.com/api/pets/$id';//url
+
+    //metodo delete
+    return http.delete(url).then((http.Response response) {
+      final int statusCode = response.statusCode;
+  
+      // si el status es erroneo
+      if (statusCode < 200 || statusCode > 400) {
+        print(response.body);//imprimimos el error en consola
+        //y creamos una excepcion
+        throw new Exception('Error al consumir el servicio');
+      }
+
+      //si todo sale bien.
+      setState(() {
+        //eliminamos el elemento de la vista
+        _pets.removeAt(position);
+      });
+
+      // y cerramos el alert dialog
+      Navigator.of(context).pop();
+    });
   }
 }
