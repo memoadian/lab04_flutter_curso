@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 //import 'package:lab_02/routes/DetailPetPage.dart';
-import 'package:lab_02/pages/PetsList.dart';//importamos PetsList
+import 'package:lab_04_flutter_curso/pages/PetsList.dart';//importamos PetsList
 
 class HomePage extends StatelessWidget {
   @override

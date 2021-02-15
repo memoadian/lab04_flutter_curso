@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lab_02/routes/AddPetPage.dart';
-import 'package:lab_02/routes/EditPetPage.dart';//importamos Añadir amigo
-import 'package:lab_02/models_api/Pet.dart';//importamos el mdoelo Pet.dart+
+import 'package:lab_04_flutter_curso/routes/AddPetPage.dart';
+import 'package:lab_04_flutter_curso/routes/EditPetPage.dart';//importamos Añadir amigo
+import 'package:lab_04_flutter_curso/models_api/Pet.dart';//importamos el mdoelo Pet.dart+
 import 'dart:convert';//json
 import 'package:http/http.dart' as http;
 
@@ -96,7 +96,7 @@ class AdminPageState extends State<AdminPage>{
           child: ListTile(//Listile para ordenar
             title: Text('Amigo'),//titulo
             subtitle: Text('Edad: 0 años'),//subtitulo
-            leading: Image.asset('images/logo_flutter.png'),//icono
+            leading: Image.asset('assets/logo_flutter.png'),//icono
             trailing: Row(//Row para acomodar iconos al final
               mainAxisSize: MainAxisSize.min,//ordenamiento horizontal
               children: <Widget>[//array

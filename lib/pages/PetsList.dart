@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';//material
-import 'package:lab_02/models_api/Pet.dart';//clase Pet
-import 'package:lab_02/routes/DetailPetPage.dart';//clase Detail Pet
+import 'package:lab_04_flutter_curso/models_api/Pet.dart';//clase Pet
+import 'package:lab_04_flutter_curso/routes/DetailPetPage.dart';//clase Detail Pet
 
 import 'dart:convert';//dependencia para json
 import 'package:http/http.dart' as http;//http

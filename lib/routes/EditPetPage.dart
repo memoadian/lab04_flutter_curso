@@ -7,8 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';//para usar json
 import 'package:progress_dialog/progress_dialog.dart';//progress dialgo al enviar form
 import 'package:http/http.dart' as http;//http
-import 'package:lab_02/models_api/Pet.dart';//model Pet
-import 'package:lab_02/main.dart';//vista principal
+import 'package:lab_04_flutter_curso/models_api/Pet.dart';//model Pet
+import 'package:lab_04_flutter_curso/main.dart';//vista principal
 
 class EditPetPage extends StatefulWidget {
   final int id;//variable id
