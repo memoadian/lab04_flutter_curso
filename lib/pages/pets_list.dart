@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart'; //material
-import 'package:lab_04_flutter_curso/models_api/Pet.dart'; //clase Pet
-import 'package:lab_04_flutter_curso/routes/DetailPetPage.dart'; //clase Detail Pet
+import 'package:lab_04_flutter_curso/models_api/pet.dart'; //clase Pet
+import 'package:lab_04_flutter_curso/routes/detail_pet_page.dart'; //clase Detail Pet
 
 import 'dart:convert'; //dependencia para json
 import 'package:http/http.dart' as http; //http
@@ -93,12 +93,10 @@ class PetsListState extends State<PetsList> {
               label: Text('Ver amigo'), //nombre del botón
               onPressed: () {
                 //evento press
-                Navigator.push(
-                  context, //mandamos el navegador
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        DetailPetPage(_pets[index].id), //a la página de detalle
-                  ),
+                Navigator.pushNamed(
+                  context,
+                  'detail',
+                  arguments: {'id': _pets[index].id},
                 );
               },
             ),

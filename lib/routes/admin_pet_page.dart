@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:lab_04_flutter_curso/routes/AddPetPage.dart';
-import 'package:lab_04_flutter_curso/routes/EditPetPage.dart'; //importamos Añadir amigo
-import 'package:lab_04_flutter_curso/models_api/Pet.dart'; //importamos el mdoelo Pet.dart+
+import 'package:lab_04_flutter_curso/routes/add_pet_page.dart';
+import 'package:lab_04_flutter_curso/routes/edit_pet_page.dart'; //importamos Añadir amigo
+import 'package:lab_04_flutter_curso/models_api/pet.dart'; //importamos el mdoelo Pet.dart+
 import 'dart:convert'; //json
 import 'package:http/http.dart' as http;
 
-class AdminPage extends StatefulWidget {
+class AdminPetPage extends StatefulWidget {
   @override
   createState() => AdminPageState();
 }
 
-class AdminPageState extends State<AdminPage> {
+class AdminPageState extends State<AdminPetPage> {
   //declaramos la variable que guardará la lista de elementos
   List<Pet> _pets = [];
 
@@ -24,7 +24,7 @@ class AdminPageState extends State<AdminPage> {
   Future<Null> getPets() async {
     //consumimos el webservice con la librería http y get
     final response =
-        await http.get(Uri.parse("http://pets.memoadian.com/api/pets/"));
+        await http.get(Uri.parse("https://pets.memoadian.com/api/pets/"));
 
     //si la respuesta es correcta responderá con 200
     if (response.statusCode == 200) {
@@ -77,8 +77,8 @@ class AdminPageState extends State<AdminPage> {
           //body del tabbar controller
           children: [
             //array (debe ser el mismo que se declara en length)
-            favs(context), //función favoritos
-            server(context), //función server
+            favs(), //función favoritos
+            server(), //función server
           ],
         ),
         //declaramos un floating button
@@ -99,7 +99,7 @@ class AdminPageState extends State<AdminPage> {
     );
   }
 
-  Widget favs(BuildContext context) {
+  Widget favs() {
     //añadimos un param context para la ruta
     return ListView(//cambiamos el texto por un listView
         children: <Widget>[
@@ -121,13 +121,7 @@ class AdminPageState extends State<AdminPage> {
               IconButton(
                 icon: Icon(Icons.edit),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      //navegar a editar amigo
-                      builder: (context) => EditPetPage(1),
-                    ),
-                  );
+                  Navigator.pushNamed(context, 'edit');
                 },
               ),
               IconButton(
@@ -142,7 +136,7 @@ class AdminPageState extends State<AdminPage> {
     ]);
   }
 
-  Widget server(BuildContext context) {
+  Widget server() {
     return ListView.builder(
       //listview builder
       itemCount: _pets.length, //contamos los elementos de la lista
@@ -186,21 +180,20 @@ class AdminPageState extends State<AdminPage> {
             IconButton(
               icon: Icon(Icons.edit),
               onPressed: () {
-                Navigator.push(
+                Navigator.pushNamed(
                   context,
-                  MaterialPageRoute(
-                      //navegar a editar amigo
-                      builder: (context) => EditPetPage(_pets[pos].id)),
+                  'edit',
+                  arguments: {'id': _pets[pos].id},
                 );
               },
             ),
-            IconButton(
+            /*IconButton(
               //icono con botón
               icon: Icon(Icons.delete), //icono
               //evento press eliminar llevará los parámetros contexto
               //la posicion del elemento, y el id para consumir el ws
               onPressed: () => deleteAlert(context, pos, _pets[pos].id),
-            ),
+            ),*/
           ],
         ),
       ),
