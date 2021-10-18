@@ -187,13 +187,13 @@ class AdminPageState extends State<AdminPetPage> {
                 );
               },
             ),
-            /*IconButton(
+            IconButton(
               //icono con botón
               icon: Icon(Icons.delete), //icono
               //evento press eliminar llevará los parámetros contexto
               //la posicion del elemento, y el id para consumir el ws
               onPressed: () => deleteAlert(context, pos, _pets[pos].id),
-            ),*/
+            ),
           ],
         ),
       ),
